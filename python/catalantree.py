@@ -91,14 +91,25 @@ def factorial(n):
 def catalan(n):
 	f0 = factorial(n)
 	f1 = factorial(2*n)
-	return f1/(f0*f0*(n + 1))
+	return f1//(f0*f0*(n + 1))
+
+def cached_catalan(n, cache):
+	if n in cache:
+		return cache[n]
+	else:
+		c = catalan(n)
+		cache[n] = c
+		return c
 
 ctr = 0
 
-def decode(I, N):
+def decode(I, N, use_cache = False, cache = {}):
 	if (N == 0):
 		return None
-	I = I % catalan(N)
+	if use_cache:
+		I = I % cached_catalan(N, cache)
+	else:
+		I = I % catalan(N)
 	root = Node()
 	global ctr
 	root.id = ctr
@@ -115,16 +126,20 @@ def decode(I, N):
 	while (s <= I):
 		Nl = N - K - 1
 		Nr = K
-		Cl = catalan(Nl)
-		Cr = catalan(Nr)
+		if use_cache:
+			Cl = cached_catalan(Nl, cache)
+			Cr = cached_catalan(Nr, cache)
+		else:
+			Cl = catalan(Nl)
+			Cr = catalan(Nr)
 		olds = s
 		s = s + Cl*Cr
 		K = K + 1
 	I = I - olds
 	Ir = I // Cl
 	Il = I - Ir*Cl
-	root.llink = decode(Il, Nl)
-	root.rlink = decode(Ir, Nr)
+	root.llink = decode(Il, Nl, use_cache, cache)
+	root.rlink = decode(Ir, Nr, use_cache, cache)
 	return root
 
 def encode(root):
