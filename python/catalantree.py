@@ -1,3 +1,6 @@
+import svgwrite
+import math
+
 class Node:
 	def __init__(self):
 		self.llink = None
@@ -44,6 +47,34 @@ class Node:
 			ret = self.rlink.enumerate(ret, prefix=prefix)
 		return ret
 
+	def depth(self):
+		md = 0
+		if self.llink or self.rlink:
+			md = 1
+		ml = 0
+		if self.llink:
+			ml = self.llink.depth()
+		mr = 0
+		if self.rlink:
+			mr = self.rlink.depth()
+		md += max(ml, mr)
+		return md
+
+	def lwidth(self):
+		w = 0
+		if self.llink:
+			w = self.llink.width() + 1
+		return w
+
+	def rwidth(self):
+		w = 0
+		if self.rlink:
+			w = self.rlink.width() + 1
+		return w
+
+	def width(self):
+		return self.lwidth() + self.rwidth()
+
 	def toDot(self):
 		ret = "\tn" + self.prefix + str(self.id) + " [shape=doublecircle, label=\"" + str(self.id) + "\"];\n"
 		lname = "n" + self.prefix +str(self.id) + "_l"
@@ -82,6 +113,50 @@ class Node:
 		if (self.rlink != None):
 			ret += self.rlink.toDot()
 		return ret
+
+	def toSvg(self, dwg = None, center = (0, 0)):
+		first_call = False
+		radius = 30
+		dx = 50
+		dy = 100
+		if dwg is None:
+			h = self.depth()*dy + radius*2 + 20
+			w = self.width()*dx + radius*2 + 20
+			dwg = svgwrite.Drawing(size=(w, h))
+			dwg.add(dwg.rect((0, 0), (w, h), fill='none'))
+			lw = 0
+			if self.llink:
+				lw = self.llink.width() + 1
+			center = (lw*dx + radius, radius + 10)
+			first_call = True
+		c = tuple(center)
+		xl = c[0]
+		if self.llink:
+			xl -= (self.llink.rwidth() + 1)*dx
+		xr = c[0]
+		if self.rlink:
+			xr += (self.rlink.lwidth() + 1)*dx
+		cl = (xl, c[1] + dy)
+		cr = (xr, c[1] + dy)
+
+		if self.llink:
+			self.llink.toSvg(dwg, cl)
+			alpha = abs(math.atan2(dy, c[0] - cl[0]))
+			c1 = (c[0] - radius*math.cos(alpha), c[1] + radius*math.sin(alpha))
+			c2 = (cl[0] + radius*math.cos(alpha), cl[1] - radius*math.sin(alpha))
+			dwg.add(dwg.line(c1, c2, stroke='black', stroke_width=3))
+		if self.rlink:
+			self.rlink.toSvg(dwg, cr)
+			alpha = abs(math.atan2(dy, cr[0] - c[0]))
+			c1 = (c[0] + radius*math.cos(alpha), c[1] + radius*math.sin(alpha))
+			c2 = (cr[0] - radius*math.cos(alpha), cr[1] - radius*math.sin(alpha))
+			dwg.add(dwg.line(c1, c2, stroke='black', stroke_width=3))
+		dwg.add(dwg.circle(c, radius, fill = 'white', stroke='black', stroke_width=3))
+		if not self.id is None:
+			dwg.add(dwg.text("{0}".format(self.id), x=[c[0]], y=[c[1]], fill = 'black', style="font-size: 30px; text-anchor: middle; dominant-baseline: middle;"))
+		if first_call:
+			return dwg
+
 
 def factorial(n):
 	if n == 0 or n == 1:
