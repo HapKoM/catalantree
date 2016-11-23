@@ -6,10 +6,19 @@ ARFLAGS = rcsv
 
 LIBS += -lgmpxx -lgmp
 
+NAME=catalantree
+
 TARGET=libcatalantree.a
 
 OBJECTS=math_tools.o\
         node.o
+
+HEADERS=math_tools.h\
+        node.h
+
+PREFIX=/usr/local
+LIB_PREFIX=$(PREFIX)/lib/$(NAME)/
+INCLUDE_PREFIX=$(PREFIX)/include/$(NAME)/
 
 all: $(TARGET)
 
@@ -24,3 +33,9 @@ math_tools.o: math_tools.cpp
 
 clean:
 	rm -rf $(TARGET) *.o
+
+install:
+	mkdir -p $(INCLUDE_PREFIX)
+	mkdir -p $(LIB_PREFIX)
+	cp -rf $(HEADERS) $(INCLUDE_PREFIX)
+	cp -rf $(TARGET) $(LIB_PREFIX)
