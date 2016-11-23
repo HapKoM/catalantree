@@ -13,7 +13,7 @@ public:
   Node();
   Node(const Node* other);
   Node(const Node& other);
-  ~Node();
+  virtual ~Node();
   bool operator==(const Node& other) const;
   bool operator!=(const Node& other) const;
   Node* llink() const;
