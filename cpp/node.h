@@ -14,8 +14,9 @@ public:
   Node(const Node* other);
   Node(const Node& other);
   virtual ~Node();
-  bool operator==(const Node& other) const;
-  bool operator!=(const Node& other) const;
+  Node& operator=(const Node& rhs);
+  bool operator==(const Node& rhs) const;
+  bool operator!=(const Node& rhs) const;
   Node* llink() const;
   Node* rlink() const;
   /**

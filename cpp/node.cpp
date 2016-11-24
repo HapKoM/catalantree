@@ -33,28 +33,42 @@ Node::~Node() {
     delete rlink_;
 }
 
-bool Node::operator==(const Node& other) const {
+Node& Node::operator=(const Node& rhs) {
+  //! Self assignment check (Scottt Meyers)
+  if (this == &rhs) return *this;
+  llink_ = nullptr;
+  rlink_ = nullptr;
+  if (rhs.llink_) {
+    llink_ = new Node(rhs.llink_);
+  }
+  if (rhs.rlink_) {
+    rlink_ = new Node(rhs.rlink_);
+  }
+  return *this;
+}
+
+bool Node::operator==(const Node& rhs) const {
   bool leq = false;
-  if (!llink_ && !other.llink_)
+  if (!llink_ && !rhs.llink_)
     // Both left subtrees are empty => they are equal
     leq = true;
-  else if (llink_ && other.llink_) {
+  else if (llink_ && rhs.llink_) {
     // Both left subtrees are not empty => need to compare
-    leq = (*(llink_) == *(other.llink_));
+    leq = (*(llink_) == *(rhs.llink_));
   } // Otherwise one left subtree is empty, other is not => they are not equal
   bool req = false;
-  if (!rlink_ && !other.rlink_)
+  if (!rlink_ && !rhs.rlink_)
     // Both right subtrees are empty => they are equal
     req = true;
-  else if (rlink_ && other.rlink_) {
+  else if (rlink_ && rhs.rlink_) {
     // Both right subtrees are not empty => need to compare
-    req = (*(rlink_) == *(other.rlink_));
+    req = (*(rlink_) == *(rhs.rlink_));
   } // Otherwise one right subtree is empty, other is not => they are not equal
   return req && leq;
 }
 
-bool Node::operator!=(const Node& other) const {
-  return !(operator==(other));
+bool Node::operator!=(const Node& rhs) const {
+  return !(operator==(rhs));
 }
 
 Node* Node::llink() const {
