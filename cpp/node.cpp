@@ -3,46 +3,56 @@
 #include "node.h"
 #include "math_tools.h"
 
-Node::Node(): llink_(nullptr), rlink_(nullptr) {
+Node::Node(): llink_(nullptr), rlink_(nullptr), plink_(nullptr) {
 }
 
-Node::Node(const Node* other): llink_(nullptr), rlink_(nullptr) {
+Node::Node(const Node* other): llink_(nullptr), rlink_(nullptr), plink_(nullptr) {
   if (other) {
     if (other->llink_) {
       llink_ = new Node(other->llink_);
+      llink_->plink_ = this;
     }
     if (other->rlink_) {
       rlink_ = new Node(other->rlink_);
+      rlink_->plink_ = this;
     }
   }
 }
 
-Node::Node(const Node& other): llink_(nullptr), rlink_(nullptr) {
+Node::Node(const Node& other): llink_(nullptr), rlink_(nullptr), plink_(nullptr) {
   if (other.llink_) {
     llink_ = new Node(other.llink_);
+    llink_->plink_ = this;
   }
   if (other.rlink_) {
     rlink_ = new Node(other.rlink_);
+    rlink_->plink_ = this;
   }
 }
 
 Node::~Node() {
-  if (llink_)
+  if (llink_) {
     delete llink_;
-  if (rlink_)
+    llink_ = nullptr;
+  }
+  if (rlink_) {
     delete rlink_;
+    rlink_ = nullptr;
+  }
 }
 
 Node& Node::operator=(const Node& rhs) {
-  //! Self assignment check (Scottt Meyers)
+  // Self assignment check (Scott Meyers)
   if (this == &rhs) return *this;
   llink_ = nullptr;
   rlink_ = nullptr;
   if (rhs.llink_) {
     llink_ = new Node(rhs.llink_);
+    llink_->plink_ = this;
   }
   if (rhs.rlink_) {
     rlink_ = new Node(rhs.rlink_);
+    rlink_->plink_ = this;
   }
   return *this;
 }
@@ -77,6 +87,36 @@ Node* Node::llink() const {
 
 Node* Node::rlink() const {
   return rlink_;
+}
+
+Node* Node::plink() const {
+  return plink_;
+}
+
+const Node* Node::root() const {
+  const Node* r = this;
+  Node* p = r->plink_;
+  while (p) {
+    r = p;
+    p = r->plink_;
+  }
+  return r;
+}
+
+void Node::setRlink(Node* n) {
+  rlink_ = n;
+  if (rlink_)
+    rlink_->plink_ = this;
+}
+
+void Node::setLlink(Node* n) {
+  llink_ = n;
+  if (llink_)
+    llink_->plink_ = this;
+}
+
+void Node::setPlink(Node* n) {
+  plink_ = n;
 }
 
 mpz_class Node::size() const {
@@ -131,7 +171,9 @@ Node* Node::decode(mpz_class I, mpz_class N) {
   Node* root = new Node();
   if (N == 1)
     return root;
+  // Number of nodes in left subtree
   mpz_class NL =  N - 1;
+  // Number of nodes in right subtree
   mpz_class NR =  0;
   mpz_class SUM = 0;
   mpz_class OLDSUM = 0;
@@ -148,10 +190,18 @@ Node* Node::decode(mpz_class I, mpz_class N) {
     K++;
   }
   I -= OLDSUM;
+  // Index of right subtree
   mpz_class IR = I / CL;
+  // Index of left subtree
   mpz_class IL = I - IR*CL;
   root->llink_ = decode(IL, NL);
+  if (root->llink_) {
+    root->llink_->plink_ = root;
+  }
   root->rlink_ = decode(IR, NR);
+  if (root->rlink_) {
+    root->rlink_->plink_ = root;
+  }
   return root;
 }
 
@@ -173,4 +223,20 @@ mpz_class Node::encode(Node* root) {
   I+= catalan(NL)*IR;
   I+= IL;
   return I;
+}
+
+Node* Node::dfs_next() const {
+  if (llink_)
+    return llink_;
+  else if (rlink_)
+    return rlink_;
+  Node* prev = plink_;
+  const Node* last_prev = this;
+  while (prev) {
+    if (prev->rlink_ && prev->rlink_ != last_prev)
+      return prev->rlink_;
+    last_prev = prev;
+    prev = prev->plink_;
+  }
+  return nullptr;
 }
