@@ -1,5 +1,5 @@
 CXX=g++
-CXXFLAGS=-Wall -g -std=c++11 -O3
+CXXFLAGS=-Wall -g -std=c++11 -O0
 
 INCLUDES = -I..
 
@@ -11,7 +11,8 @@ TESTS = LibControlTest
 
 OBJECTS = MainTest.o\
           MathTest.o\
-          NodeTest.o
+          NodeTest.o\
+          TreeContainerTest.o
 
 all: $(TESTS)
 
@@ -26,6 +27,9 @@ MathTest.o: MathTest.cpp ../math_tools.h
 
 NodeTest.o: NodeTest.cpp ../math_tools.h ../node.h
 	$(CXX) $(INCLUDES) $(CXXFLAGS) -c NodeTest.cpp
+
+TreeContainerTest.o: TreeContainerTest.cpp ../treecontainer.h ../node.h
+	$(CXX) $(INCLUDES) $(CXXFLAGS) -c TreeContainerTest.cpp
 
 LibControlTest: $(OBJECTS) ../libcatalantree.a
 	$(CXX) $(CXXFLAGS) $(LIBS) $^ -o $@
