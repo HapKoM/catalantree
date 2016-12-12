@@ -1,7 +1,7 @@
 CXX=g++
 AR=ar
 
-CXXFLAGS=-g -Wall -Weffc++ -Wextra -Wpedantic -g -std=c++11 -O3 -static
+CXXFLAGS=-g -Wall -Weffc++ -Wextra -Wpedantic -g -std=c++11 -O0 -static
 ARFLAGS = rcsv
 
 LIBS += -lgmpxx -lgmp

@@ -55,7 +55,7 @@ namespace {
     gmp_randclass rg(gmp_randinit_default);
     rg.seed(time(NULL));
     for (int j = 1; j < 100; ++j) {
-      const mpz_class N = rg.get_z_bits(5);
+      const size_t N = j;
       const mpz_class I = rg.get_z_bits(100) % catalan(N);
       Node* n3 = Node::decode(I, N);
       mpz_class I1 = 0;

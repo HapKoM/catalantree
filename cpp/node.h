@@ -8,6 +8,7 @@
  */
 class Node {
 public:
+  typedef size_t size_type;
   Node();
   Node(const Node* other);
   Node(const Node& other);
@@ -32,27 +33,27 @@ public:
   /**
    * @brief Tree nodes count (including root node)
    */
-  mpz_class size() const;
+  size_type size() const;
   /**
    * @brief Maximum tree depth
    */
-  mpz_class depth() const;
+  size_type depth() const;
   /**
    * @brief Width of left subtree
    */
-  mpz_class lwidth() const;
+  size_type lwidth() const;
   /**
    * @brief Width of right subtree
    */
-  mpz_class rwidth() const;
+  size_type rwidth() const;
   /**
    * @brief Width of tree
    */
-  mpz_class width() const;
+  size_type width() const;
   /**
    * @brief Decode index "I" into binary tree with "N" nodes and return pointer to root node
    */
-  static Node* decode(mpz_class I, mpz_class N);
+  static Node* decode(mpz_class I, size_type N);
   /**
    * @brief Encode tree "root" and return its index
    */
@@ -61,7 +62,7 @@ public:
    * @brief Search next node in DFS order
    */
   Node* dfs_next() const;
-private:
+protected:
   //! Left subtree
   Node* llink_;
   //! Right subtree

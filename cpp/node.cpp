@@ -119,20 +119,20 @@ void Node::setPlink(Node* n) {
   plink_ = n;
 }
 
-mpz_class Node::size() const {
-  mpz_class lsz(0);
+size_t Node::size() const {
+  size_t lsz(0);
   if (llink_)
     lsz = llink_->size();
-  mpz_class rsz(0);
+  size_t rsz(0);
   if (rlink_)
     rsz = rlink_->size();
   return lsz + rsz + 1;
 }
 
-mpz_class Node::depth() const {
-  mpz_class md(0);
-  mpz_class ml(0);
-  mpz_class mr(0);
+size_t Node::depth() const {
+  size_t md(0);
+  size_t ml(0);
+  size_t mr(0);
   if (llink_ || rlink_)
     md = 1;
   if (llink_)
@@ -146,25 +146,25 @@ mpz_class Node::depth() const {
   return md;
 }
 
-mpz_class Node::lwidth() const {
-  mpz_class w(0);
+size_t Node::lwidth() const {
+  size_t w(0);
   if (llink_)
     w = llink_->width() + 1;
   return w;
 }
 
-mpz_class Node::rwidth() const {
-  mpz_class w(0);
+size_t Node::rwidth() const {
+  size_t w(0);
   if (rlink_)
     w = rlink_->width() + 1;
   return w;
 }
 
-mpz_class Node::width() const {
+size_t Node::width() const {
   return lwidth() + rwidth();
 }
 
-Node* Node::decode(mpz_class I, mpz_class N) {
+Node* Node::decode(mpz_class I, size_t N) {
   if (N == 0)
     return nullptr;
   I %= catalan(N);
@@ -172,12 +172,12 @@ Node* Node::decode(mpz_class I, mpz_class N) {
   if (N == 1)
     return root;
   // Number of nodes in left subtree
-  mpz_class NL =  N - 1;
+  size_t NL =  N - 1;
   // Number of nodes in right subtree
-  mpz_class NR =  0;
+  size_t NR =  0;
   mpz_class SUM = 0;
   mpz_class OLDSUM = 0;
-  mpz_class K = 0;
+  size_t K = 0;
   mpz_class CL = 0;
   mpz_class CR = 0;
   while (SUM <= I) {
@@ -208,16 +208,16 @@ Node* Node::decode(mpz_class I, mpz_class N) {
 mpz_class Node::encode(Node* root) {
   if (!root)
     return 0;
-  mpz_class N = root->size();
-  mpz_class NL = 0;
+  size_t N = root->size();
+  size_t NL = 0;
   if (root->llink_) {
     NL = root->llink_->size();
   }
   mpz_class IL = encode(root->llink_);
   mpz_class IR = encode(root->rlink_);
-  mpz_class NR = N - NL - 1;
+  size_t NR = N - NL - 1;
   mpz_class I = 0;
-  for (mpz_class K = 0; K < NR; ++K) {
+  for (size_t K = 0; K < NR; ++K) {
     I += catalan(N - K - 1)*catalan(K);
   }
   I+= catalan(NL)*IR;
