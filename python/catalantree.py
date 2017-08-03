@@ -3,13 +3,20 @@ import math
 
 class Node:
 	def __init__(self):
+		# left subtree
 		self.llink = None
+		# right subtree
 		self.rlink = None
+		# parent node
 		self.plink = None
+		# id of node (assigned after enumerating or manually)
 		self.id = -1
+		# Prefix  for enumeration
+		# This is the auxiliary variable for DOT format generation
 		self.prefix = ""
 
 	def size(self):
+		""" Get number of nodes in the tree """
 		lsz = 0
 		if (self.llink != None):
 			lsz = self.llink.size()
@@ -18,14 +25,10 @@ class Node:
 			rsz = self.rlink.size()
 		return lsz + rsz + 1
 
-	def dfs(self):
-		print(self.id)
-		if (self.llink != None):
-			self.llink.dfs()
-		if (self.rlink != None):
-			self.rlink.dfs()
-
 	def toDict(self):
+		""" Represent tree as recursive structure dictionary:
+				{'id': id, 'llink': {...}, 'rlink': {...}}
+		"""
 		d = {}
 		d['id'] = self.id
 		if (self.llink != None):
@@ -35,6 +38,7 @@ class Node:
 		return d
 
 	def enumerate(self, id0 = None, prefix=""):
+		""" Enumerate nodes of the tree in the DFS order and assign ids """
 		if (id0 == None):
 			self.id = 0
 		else:
@@ -48,6 +52,7 @@ class Node:
 		return ret
 
 	def depth(self):
+		""" Calculate maximum depth of the tree """
 		md = 0
 		if self.llink or self.rlink:
 			md = 1
@@ -61,21 +66,27 @@ class Node:
 		return md
 
 	def lwidth(self):
+		""" width of the left subtree """
 		w = 0
 		if self.llink:
 			w = self.llink.width() + 1
 		return w
 
 	def rwidth(self):
+		""" width of the right subtree """
 		w = 0
 		if self.rlink:
 			w = self.rlink.width() + 1
 		return w
 
 	def width(self):
+		""" width of the tree """
 		return self.lwidth() + self.rwidth()
 
 	def toDot(self):
+		""" Generate representation of the subtree in the DOT format and retur it as string
+				For DOT format description and usage see http://www.graphviz.org/pdf/dotguide.pdf
+		"""
 		ret = "\tn" + self.prefix + str(self.id) + " [shape=doublecircle, label=\"" + str(self.id) + "\"];\n"
 		lname = "n" + self.prefix +str(self.id) + "_l"
 		mname = "n" + self.prefix +str(self.id) + "_m"
@@ -115,6 +126,7 @@ class Node:
 		return ret
 
 	def toSvg(self, dwg = None, center = (0, 0)):
+		""" Generate SVG drawing representation of this tree """
 		first_call = False
 		radius = 30
 		dx = 50
@@ -179,6 +191,9 @@ def cached_catalan(n, cache):
 ctr = 0
 
 def decode(I, N, use_cache = False, cache = {}):
+	""" Decode index of the tree I with nodes number N to the Node object
+			For algorithm description see https://www.dropbox.com/s/boj4hc4caqu0i8h/paper_tree_encoding_fixed.docx?dl=0 (in Russian)
+	"""
 	if (N == 0):
 		return None
 	if use_cache:
@@ -218,6 +233,9 @@ def decode(I, N, use_cache = False, cache = {}):
 	return root
 
 def encode(root):
+	""" Encode tree to its index I
+			For algorithm description see https://www.dropbox.com/s/boj4hc4caqu0i8h/paper_tree_encoding_fixed.docx?dl=0 (in Russian)
+	"""
 	if (root == None):
 		return 0
 	N = root.size()
